@@ -1,0 +1,14 @@
+extends default
+
+block header
+
+block content
+    div.enemyProfile
+        div.enemyProfile-image(style=`background: url('/images/${namable.imagePath}') top center no-repeat; background-size: cover;`)
+        div.enemy-details
+            h1.enemy-name
+                | #{namable.name}
+            h2.enemy-hp
+                | #{namable.state}
+            p.enemy-bio
+                | #{namable._id}

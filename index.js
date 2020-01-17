@@ -9,6 +9,7 @@ let express = require('express'),
     path = require('path');
     const multer = require('multer');
 
+app.set('view engine', 'pug');
 
 app.use(express.static('./public'));
 
@@ -44,6 +45,50 @@ let playerRoutes = require('./routes/playerRoute'); //importing route
 playerRoutes(app); //register the route
 let gameRoutes = require('./routes/gameRoutes');
 gameRoutes(app);
+
+app.get('/', (req, res) => {
+    Namable.find({},function(err,namableQuery){
+        if(err) res.send(err);
+        else {
+            Location.find({},function (err,locationQuery){
+                if(err) res.send(err);
+                else{
+                    res.render('index',{
+                        title:'Hoem',
+                        namables: namableQuery,
+                        locations: locationQuery
+                    });
+                }
+            });
+        }
+    })
+});
+
+app.get('/profile', (req, res) => {
+    Namable.findOne({_id:req.query.id},function(err,namable){
+        if(err) res.send(err);
+        else{
+            if(namable) {
+                res.render('namable', {
+                    title: `About ${namable.name}`,
+                    namable: namable
+                });
+            }
+            else{
+                Location.findOne({_id:req.query.id},function(err,location){
+                    if(err) res.send(err);
+                    else if(location){
+                        res.render('namable', {
+                            title: `About ${location.name}`,
+                            namable: location
+                        });
+                    }
+                    else res.send("Entity could not be found");
+                });
+            }
+        }
+    });
+});
 
 app.listen(port);
 

@@ -2,14 +2,14 @@ extends default
 
 block content
     div.container
-        each namable in namables
+        each entity in entities
             div.enemy
-                div.enemy-image(style=`background: url('/images/${namable.imagePath}') top center no-repeat; background-size: contain;`)
+                div.enemy-image(style=`background: url('/images/${entity.imagePath}') top center no-repeat; background-size: contain;`)
                 h2.enemy-name
-                    | #{namable.name}
+                    | #{entity.name}
                 h3
                     | Entity
-                a(href=`/profile?id=${namable.id}`)
+                a(href=`/getEntityInformation?id=${entity.id}`)
                     | View Entity
 
                 div.enemy
@@ -20,5 +20,5 @@ block content
                     | #{location.name}
                 h3
                     | Location
-                a(href=`/profile?id=${location.id}`)
+                a(href=`/getLocationInformation?id=${location.id}`)
                     | View Location

@@ -1,0 +1,14 @@
+extends default
+
+block header
+
+block content
+    div.enemyProfile
+        div.enemyProfile-image(style=`background: url('/images/${entity.imagePath}') top center no-repeat; background-size: cover;`)
+        div.enemy-details
+            h1.enemy-name
+                | #{entity.name}
+            h2.enemy-hp
+                | State : #{entity.state}
+            p.enemy-bio
+                | Owning Player ID : #{entity.user}

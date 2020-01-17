@@ -8,7 +8,7 @@ let index = require('../index');
 var mongoose = require('mongoose'),
     Player = mongoose.model('Player'),
         Location = mongoose.model('Location'),
-            Namable = mongoose.model('Namable');
+            Entity = mongoose.model('Entity');
 
 /*exports.save = function(req,res){
     let player;
@@ -32,7 +32,7 @@ var mongoose = require('mongoose'),
 
                     let locations = body.locations;
 
-                    Namable.find({user: player._id,uniqueID:},function(err,namable){
+                    Entity.find({user: player._id,uniqueID:},function(err,namable){
                         console.log(namable);
                     });
                 }
@@ -63,7 +63,7 @@ exports.load = function(req,res){
     Player.findOne({ name: data.name, 'tokens.token': token},function(err,player){
         if(err) res.send(err);
         else{
-            Namable.find({user: player._id},function(err,namables){
+            Entity.find({user: player._id},function(err,namables){
                 console.log(namables);
             });
         }
@@ -83,13 +83,13 @@ exports.upload = function(req,res){
 
        let upload = multer({ storage: index.storage, fileFilter: helpers.imageFilter }).single('test');
 
-       Namable.findOne({ uniqueID:req.body.uniqueID }, function (err,namable) {
+       Entity.findOne({ uniqueID:req.body.uniqueID }, function (err,entity) {
            if(err) res.send(err);
            else{
-               if(namable != null){
-                   namable.imagePath = req.imagePath;
+               if(entity != null){
+                   entity.imagePath = req.imagePath;
                    found = true;
-                   namable.save();
+                   entity.save();
                    res.send("file upload successful");
                }else{
                    Location.findOne({ uniqueID:req.body.uniqueID }, function (err,loc) {
@@ -123,13 +123,13 @@ exports.download = function(req,res){
     let found = false;
 
     try{
-    Namable.findOne({ uniqueID:req.body.uniqueID }, function (err,namable) {
+    Entity.findOne({ uniqueID:req.body.uniqueID }, function (err,entity) {
         if(err) res.send(err);
         else{
-            if(namable != null){
+            if(entity != null){
                 found = true;
                 res.contentType('image/jpeg');
-                res.sendFile(namable.imagePath,options,function(err){if(err) throw new Error();});
+                res.sendFile(entity.imagePath,options,function(err){if(err) throw new Error();});
             }else{
                 Location.findOne({ uniqueID:req.body.uniqueID }, function (err,loc) {
                     if(err) res.send(err);
@@ -152,10 +152,10 @@ exports.download = function(req,res){
 
 exports.getAll = function(req,res){
     let payload = {};
-    Namable.find({user:req.playerID},function(err,namables){
+    Entity.find({user:req.playerID},function(err,entities){
         if(err) res.send(err);
         else{
-            payload.namables = namables;
+            payload.namables = entities;
             Location.find({user:req.playerID},function(err,loc){
                 if(err) res.send(err);
                 payload.locations = loc;
@@ -167,52 +167,52 @@ exports.getAll = function(req,res){
 
 exports.addOrUpdate = function(req,res){
     if(req.body.isNamable){
-        Namable.findOne({user:req.playerID,uniqueID:req.body.uniqueID},function(namableErr,namableFound){
-            if(namableErr) res.send(namableErr);
+        Entity.findOne({user:req.playerID,uniqueID:req.body.uniqueID},function(err,entity){
+            if(err) res.send(err);
             else {
-                    if(namableFound){
+                    if(entity){
                     if(req.body.name)
-                        namableFound.name = req.body.name;
+                        entity.name = req.body.name;
                     if(req.body.state)
-                        namableFound.state = req.body.state;
+                        entity.state = req.body.state;
                     if(req.body.image)
-                        namableFound.image = req.body.image;
-                    namableFound.save();
+                        entity.image = req.body.image;
+                    entity.save();
                     res.send("Changes saved");
                 }
                 else{
-                    let namable = new Namable({
+                    let newEntity = new Entity({
                         user: req.playerID,
                         uniqueID: req.body.uniqueID,
                         name: req.body.name,
                         state: req.body.state
                     });
-                    namable.save(function(err,namable){
+                        newEntity.save(function(err,e){
                         if(err) res.send(err);
-                        res.send(namable);
+                        res.send(e);
                     });
                 }
             }
         });
     }
     else{
-        Location.findOne({user:req.playerID,uniqueID:req.body.uniqueID},function(locErr,locFound){
-            if(locErr) res.send(locErr);
+        Location.findOne({user:req.playerID,uniqueID:req.body.uniqueID},function(err,loc){
+            if(err) res.send(err);
             else {
-                if(locFound){
+                if(loc){
                     if(req.body.name)
-                        locFound.name = req.body.name;
+                        loc.name = req.body.name;
                     if(req.body.state)
-                        locFound.state = req.body.state;
+                        loc.state = req.body.state;
                     if(req.body.image)
-                        locFound.image = req.body.image;
+                        loc.image = req.body.image;
                     if(req.body.hideLocationNr)
-                        locFound.hideLocationNr = req.body.hideLocationNr;
+                        loc.hideLocationNr = req.body.hideLocationNr;
                     if(req.body.hideEntityNr)
-                        locFound.hideEntityNr = req.body.hideEntityNr;
+                        loc.hideEntityNr = req.body.hideEntityNr;
                     if(req.body.hideActionNr)
-                        locFound.hideActionNr = req.body.hideActionNr;
-                    locFound.save();
+                        loc.hideActionNr = req.body.hideActionNr;
+                    loc.save();
                     res.send("Changes saved");
                 }
                 else{
@@ -236,7 +236,7 @@ exports.addOrUpdate = function(req,res){
 };
 
 exports.clear = function(req,res){
-    Namable.deleteMany({user:req.playerID},function (err) {
+    Entity.deleteMany({user:req.playerID},function (err) {
         if(err) res.send(err);
         else Location.deleteMany({user:req.playerID},function (err) {
             if(err) res.send(err);
@@ -249,14 +249,14 @@ exports.clear = function(req,res){
 //Deprecated
 exports.getPhoto = function(req,res){
     let found = false;
-    Namable.findOne({user:req.playerID,uniqueID:req.body.uniqueID}, function(err,namable){
+    Entity.findOne({user:req.playerID,uniqueID:req.body.uniqueID}, function(err,entity){
         if(err) res.send(err);
         else {
-            if(namable != null){
-                if(namable.image != ""){
+            if(entity != null){
+                if(entity.image != ""){
                     res.contentType('image/jpeg');
                     found = true;
-                    res.send(namable.image);
+                    res.send(entity.image);
                 }
                 else res.send("This Entity does not have an Image Yet!");
             }
@@ -283,11 +283,11 @@ exports.getPhoto = function(req,res){
 
 exports.getEntity = function(req,res){
      let found = false;
-     Namable.findOne({user:req.playerID,uniqueID:req.body.uniqueID}, function(err,namable){
+     Entity.findOne({user:req.playerID,uniqueID:req.body.uniqueID}, function(err,entity){
          if(err) res.send(err);
          else {
-             if(namable != null){
-                 res.send(namable);
+             if(entity != null){
+                 res.send(entity);
              }
              else{
                  Location.findOne({user: req.playerID, uniqueID: req.body.uniqueID}, function (err, loc) {

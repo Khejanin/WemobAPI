@@ -1,0 +1,20 @@
+extends default
+
+block header
+
+block content
+    div.enemyProfile
+        div.enemyProfile-image(style=`background: url('/images/${location.imagePath}') top center no-repeat; background-size: cover;`)
+        div.enemy-details
+            h1.enemy-name
+                | #{location.name}
+            h2.enemy-hp
+                | State : #{location.state}
+            p.enemy-bio
+                | Owning Player ID : #{location.user}
+            p.enemy-bio
+                | Number of hidden Locations : #{location.hideLocationNr}
+            p.enemy-bio
+                | Number of hidden Locations : #{location.hideEntityNr}
+            p.enemy-bio
+                | Number of hidden Locations : #{location.hideActionNr}

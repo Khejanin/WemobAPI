@@ -3,7 +3,7 @@ let express = require('express'),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
     Player = require('./models/playerModel'), //created model loading here
-    Namable = require('./models/namableModel'), //created model loading here
+    Entity = require('./models/entityModel'), //created model loading here
     Location = require('./models/locationModel')
     bodyParser = require('body-parser');
     path = require('path');
@@ -47,7 +47,7 @@ let gameRoutes = require('./routes/gameRoutes');
 gameRoutes(app);
 
 app.get('/', (req, res) => {
-    Namable.find({},function(err,namableQuery){
+    Entity.find({},function(err,entityQuery){
         if(err) res.send(err);
         else {
             Location.find({},function (err,locationQuery){
@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
                 else{
                     res.render('index',{
                         title:'Hoem',
-                        namables: namableQuery,
+                        entities: entityQuery,
                         locations: locationQuery
                     });
                 }
@@ -64,30 +64,38 @@ app.get('/', (req, res) => {
     })
 });
 
-app.get('/profile', (req, res) => {
-    Namable.findOne({_id:req.query.id},function(err,namable){
+app.get('/getEntityInformation', (req, res) => {
+    Entity.findOne({_id:req.query.id},function(err,entity){
         if(err) res.send(err);
         else{
-            if(namable) {
-                res.render('namable', {
-                    title: `About ${namable.name}`,
-                    namable: namable
+            if(entity) {
+                res.render('entity', {
+                    title: `About ${entity.name}`,
+                    entity: entity
                 });
             }
             else{
-                Location.findOne({_id:req.query.id},function(err,location){
-                    if(err) res.send(err);
-                    else if(location){
-                        res.render('namable', {
-                            title: `About ${location.name}`,
-                            namable: location
-                        });
-                    }
-                    else res.send("Entity could not be found");
-                });
+                res.send("Entity could not be found");
             }
         }
-    });
+    })
+});
+
+app.get('/getLocationInformation', (req, res) => {
+    Location.findOne({_id:req.query.id},function(err,location){
+        if(err) res.send(err);
+        else{
+            if(location) {
+                res.render('location', {
+                    title: `About ${location.name}`,
+                    location: location
+                });
+            }
+            else{
+                res.send("Location could not be found");
+            }
+        }
+    })
 });
 
 app.listen(port);

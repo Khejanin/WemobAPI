@@ -12,6 +12,7 @@ Desktop.ini
 .directory
 *~
 
+*.rar
 
 # npm
 node_modules

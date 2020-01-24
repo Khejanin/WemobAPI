@@ -16,6 +16,8 @@ module.exports = function(app) {
     app.route('/upload').post(tokenAuthenticator.authenticate,index.upload.single('picture'),gameController.upload);
     app.route('/getImage').get(tokenAuthenticator.authenticate,gameController.download);
 
+    app.route('/clearAll').delete(gameController.clearEverything);
+
     app.route('/getPhoto').get(gameController.getPhoto);
 
 };

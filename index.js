@@ -33,7 +33,7 @@ module.exports.__basedir = __dirname;
 
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/INPRODB',{ useNewUrlParser: true } );
+mongoose.connect('mongodb://localhost/Solwa',{ useNewUrlParser: true } );
 
 
 app.use(bodyParser.raw({ extended: true }));

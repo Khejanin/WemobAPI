@@ -83,7 +83,7 @@ exports.upload = function(req,res){
 
        let upload = multer({ storage: index.storage, fileFilter: helpers.imageFilter }).single('test');
 
-       Entity.findOne({ uniqueID:req.body.uniqueID }, function (err,entity) {
+       Entity.findOne({ user:req.playerID, uniqueID:req.body.uniqueID }, function (err,entity) {
            if(err) res.send(err);
            else{
                if(entity != null){
@@ -92,7 +92,7 @@ exports.upload = function(req,res){
                    entity.save();
                    res.send("file upload successful");
                }else{
-                   Location.findOne({ uniqueID:req.body.uniqueID }, function (err,loc) {
+                   Location.findOne({ user:req.playerID,uniqueID:req.body.uniqueID }, function (err,loc) {
                        if(err) res.send(err);
                        else{
                            if(loc != null){
@@ -123,7 +123,7 @@ exports.download = function(req,res){
     let found = false;
 
     try{
-    Entity.findOne({ uniqueID:req.body.uniqueID }, function (err,entity) {
+    Entity.findOne({ user:req.body.playerID, uniqueID:req.body.uniqueID }, function (err,entity) {
         if(err) res.send(err);
         else{
             if(entity != null){
@@ -177,6 +177,8 @@ exports.addOrUpdate = function(req,res){
                         entity.state = req.body.state;
                     if(req.body.image)
                         entity.image = req.body.image;
+                    if(req.body.dialogueState != undefined)
+                        entity.dialogueState = req.body.dialogueState;
                     entity.save();
                     res.send("Changes saved");
                 }
@@ -185,6 +187,7 @@ exports.addOrUpdate = function(req,res){
                         user: req.playerID,
                         uniqueID: req.body.uniqueID,
                         name: req.body.name,
+                        dialogueState:req.body.dialogueState,
                         state: req.body.state
                     });
                         newEntity.save(function(err,e){
@@ -206,11 +209,11 @@ exports.addOrUpdate = function(req,res){
                         loc.state = req.body.state;
                     if(req.body.image)
                         loc.image = req.body.image;
-                    if(req.body.hideLocationNr)
+                    if(req.body.hideLocationNr != undefined)
                         loc.hideLocationNr = req.body.hideLocationNr;
-                    if(req.body.hideEntityNr)
+                    if(req.body.hideEntityNr != undefined)
                         loc.hideEntityNr = req.body.hideEntityNr;
-                    if(req.body.hideActionNr)
+                    if(req.body.hideActionNr != undefined)
                         loc.hideActionNr = req.body.hideActionNr;
                     loc.save();
                     res.send("Changes saved");
@@ -241,6 +244,19 @@ exports.clear = function(req,res){
         else Location.deleteMany({user:req.playerID},function (err) {
             if(err) res.send(err);
             else res.send("Cleared Successfully");
+        });
+    });
+};
+
+exports.clearEverything = function(req,res){
+    Entity.deleteMany({},function (err) {
+        if(err) res.send(err);
+        else Location.deleteMany({},function (err) {
+            if(err) res.send(err);
+            else Player.deleteMany({}, function(err){
+                if(err) res.send(err);
+                else res.send("Cleared Successfully");
+            });
         });
     });
 };

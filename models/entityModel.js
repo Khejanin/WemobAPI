@@ -16,6 +16,10 @@ let Entity = new Schema({
     name:{
         type:String
     },
+    dialogueState:{
+        type:Number,
+        default:0
+    },
     state:{
         type:String
     },
